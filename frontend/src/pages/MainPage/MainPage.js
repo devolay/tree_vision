@@ -4,7 +4,6 @@ const MainPage = () => {
   return (
     <div>
       <MapBoard></MapBoard>
-      <p>HEJ</p>
     </div>
   );
 };
