@@ -2,8 +2,7 @@ import styled from "styled-components";
 import { Typography } from "@material-ui/core";
 
 export const MapWrapper = styled.div`
-  width: 1000px;
-  height: 1000px;
+  width: 100%;
   display: flex;
 `;
 

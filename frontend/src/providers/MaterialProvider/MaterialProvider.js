@@ -21,13 +21,15 @@ const fontFamily = [
 const theme = createMuiTheme({
   typography: {
     button: {
-      textTransform: "capitalize",
+      textTransform: "none",
+      fontWeight: "200",
+      fontFamily: fontFamily,
     },
     fontFamily: fontFamily,
   },
   palette: {
     primary: {
-      main: "#2A6041",
+      main: "#FFFFFF",
     },
     background: { default: "#28965A" },
   },

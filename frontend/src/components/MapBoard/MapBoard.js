@@ -1,11 +1,20 @@
-import { GoogleMap, useLoadScript, Marker } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  useLoadScript,
+  Marker,
+  InfoWindow,
+} from "@react-google-maps/api";
 import * as Styles from "./MapBoard.styles";
 import { GOOGLE_MAP_API_KEY } from "../../shared/constants";
-import { useRef, useState } from "react";
-import mapStyles from "../../mapStyles";
+import { useRef, useState, useEffect } from "react";
+import { mapStyles } from "../../mapStyles";
 import data from "../../static/pelnabaza.json";
 
+
+const wms_url =
+  "https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/HighResolution?";
 const libaries = ["places"];
+const axios = require("axios");
 const mapContainerStyle = {
   width: "100vw",
   height: "100vh",
@@ -30,13 +39,56 @@ const MapBoard = (props) => {
   const loadData = () => JSON.parse(JSON.stringify(data));
   const [markers, setMarkers] = useState(loadData);
   const [selected, setSelected] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   if (loadError) return "Error loading maps";
   if (!isLoaded) return "Loading Maps";
 
+  const handleMarkerClick = (marker) => {
+    setSelected(marker);
+    WMSGetTileUrl(marker.lat, marker.lng);
+    if(isOpen){
+      setIsOpen(false);
+    }
+    setIsOpen(true);
+  }
+
+  function WMSGetTileUrl(lat, lng) {
+    var version = "1.1.1";
+    var request = "GetMap";
+    var format = "image/png";
+    var layers = "Raster";
+    var srs = "EPSG:4326";
+    var bbox = lng-0.0001 + "," + lat-0.0001 + "," + lng+0.0001 + "," + lat+0.0001;
+    var width = 256;
+    var height = 256;
+    var styles = "default";
+    var url =
+      wms_url +
+      "version=" +
+      version +
+      "&request=" +
+      request +
+      "&Layers=" +
+      layers +
+      "&Styles=" +
+      styles +
+      "&SRS=" +
+      srs +
+      "&BBOX=" +
+      bbox +
+      "&width=" +
+      width +
+      "&height=" +
+      height +
+      "&format="
+      + format;
+
+    return url;
+  }
+
   return (
     <Styles.MapWrapper>
-      {/* <Styles.StyledTypo variant="h3">TREE VISION 🌳</Styles.StyledTypo> */}
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={14}
@@ -56,7 +108,18 @@ const MapBoard = (props) => {
               origin: new window.google.maps.Point(0, 0),
               anchor: new window.google.maps.Point(16, 16),
             }}
-          />
+            onClick={() => {
+              handleMarkerClick(marker);
+            }}
+          >
+            {isOpen && selected===marker ? (
+              <InfoWindow>
+                <div>
+                  <h2>{selected.name}</h2>
+                </div>
+              </InfoWindow>
+            ) : null}
+          </Marker>
         ))}
       </GoogleMap>
     </Styles.MapWrapper>

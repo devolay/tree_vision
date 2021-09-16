@@ -1,4 +1,4 @@
-﻿ID,"Nazwa drzewa",Ulica/miejsce,Obwód-130,Obwód-5,"lat","lng","data",Wolontariusz,"Pomnik przyrody",Choroby,Wady,Uwagi
+﻿id,name,ulica,obw130,obw5,lat,lng,data,volonteer,statue,illness,cons,remarks
 1,"Miłorząb dwuklapowy ","Rondo Jagiellonów",180,0,53.12386758373173,18.00607413053513,"2020-12-10 15:12:12",Waldek,TAK,NIE,,
 2,"Jodła koreańska",Niedźwiedzia,51,0,53.121844320581104,17.999253273010257,"2020-12-11 16:20:22",Marzena,NIE,NIE,,
 3,"Dąb błotny",Niedźwiedzia,84,0,53.122361010202,17.999497354030613,"2020-12-11 16:29:27",Marzena,NIE,NIE,,
