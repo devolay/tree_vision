@@ -1,21 +1,32 @@
-import time
-from flask import Flask
+import base64
+import os,io
+from flask import Flask, request, jsonify, Response,make_response, send_file
+from flask_cors import CORS, cross_origin
 from owslib.wms import WebMapService
 
 app = Flask(__name__)
+CORS(app, origins=[])
+app.config['CORS_HEADERS'] = 'Content-Type'
 
-@app.route('/time')
-def get_current_time():
-    return {'time': time.time()}
 
-@app.rout('/getTreeImage')
-def get_tree_image(lat, lng):
-    wms_url = 'https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/HighResolution'
-    wms = WebMapService(wms_url, version='1.1.1')
-    img = wms.getmap(layers=['Raster'], 
-                styles=['default'],
-                srs='EPSG:4326',
-                bbox=(lng-0.0001,lat-0.0001,lng+0.0001,lat+0.0001), #lon = x lat = y
-                size=(256,256),
-                format='image/png')
-    print(img)
+@app.route('/getTreeImage/', methods=['GET'])
+@cross_origin(origins=[])
+def get_tree_image():
+    lat = 0.0
+    lng = 0.0
+    if request.args.get("lat") is not None:
+        lat = float(request.args.get("lat"))
+    if request.args.get("lng") is not None:
+        lng = float(request.args.get("lng"))
+    if lat!=0.0 and lng!=0.0:
+        wms_url = 'https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/HighResolution'
+        wms = WebMapService(wms_url, version='1.1.1')
+        img = wms.getmap(layers=['Raster'], 
+                    styles=['default'],
+                    srs='EPSG:4326',
+                    bbox=(lng-0.00013,lat-0.0001,lng+0.00013,lat+0.0001), #lon = x lat = y
+                    size=(256,256),
+                    format='image/png')
+        return jsonify(imageB64 = str(base64.b64encode(img.read()))[2:-1])
+    else:
+        return Response(status=400)

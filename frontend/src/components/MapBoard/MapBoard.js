@@ -2,17 +2,15 @@ import {
   GoogleMap,
   useLoadScript,
   Marker,
-  InfoWindow,
+  InfoBox,
 } from "@react-google-maps/api";
 import * as Styles from "./MapBoard.styles";
 import { GOOGLE_MAP_API_KEY } from "../../shared/constants";
-import { useRef, useState, useEffect } from "react";
+import { useState } from "react";
 import { mapStyles } from "../../mapStyles";
 import data from "../../static/pelnabaza.json";
 
 
-const wms_url =
-  "https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/HighResolution?";
 const libaries = ["places"];
 const axios = require("axios");
 const mapContainerStyle = {
@@ -40,51 +38,42 @@ const MapBoard = (props) => {
   const [markers, setMarkers] = useState(loadData);
   const [selected, setSelected] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [treeImage, setTreeImage] = useState(null);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   if (loadError) return "Error loading maps";
   if (!isLoaded) return "Loading Maps";
 
-  const handleMarkerClick = (marker) => {
+  const handleMarkerClick = async (marker) => {
     setSelected(marker);
-    WMSGetTileUrl(marker.lat, marker.lng);
-    if(isOpen){
+    if (isOpen) {
       setIsOpen(false);
+      setIsImageLoaded(false);
     }
+    await axios
+      .get("http://127.0.0.1:5000/getTreeImage/", {
+        params: {
+          lat: marker.lat,
+          lng: marker.lng,
+        },
+        headers: {
+          "content-type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
+        },
+        crossDomain: true,
+      })
+      .then((response) => {
+        setTreeImage(response.data.imageB64)
+        setIsImageLoaded(true)
+    });
+
     setIsOpen(true);
   }
 
-  function WMSGetTileUrl(lat, lng) {
-    var version = "1.1.1";
-    var request = "GetMap";
-    var format = "image/png";
-    var layers = "Raster";
-    var srs = "EPSG:4326";
-    var bbox = lng-0.0001 + "," + lat-0.0001 + "," + lng+0.0001 + "," + lat+0.0001;
-    var width = 256;
-    var height = 256;
-    var styles = "default";
-    var url =
-      wms_url +
-      "version=" +
-      version +
-      "&request=" +
-      request +
-      "&Layers=" +
-      layers +
-      "&Styles=" +
-      styles +
-      "&SRS=" +
-      srs +
-      "&BBOX=" +
-      bbox +
-      "&width=" +
-      width +
-      "&height=" +
-      height +
-      "&format="
-      + format;
-
-    return url;
+  const handleCloseInfoWindow = () => {
+    setIsOpen(false);
+    setIsImageLoaded(false);
   }
 
   return (
@@ -95,9 +84,9 @@ const MapBoard = (props) => {
         center={center}
         options={options}
       >
-        {markers.map((marker) => (
+        {markers.map((marker, index) => (
           <Marker
-            key={marker.id}
+            key={index}
             position={{
               lat: parseFloat(marker.lat),
               lng: parseFloat(marker.lng),
@@ -112,12 +101,27 @@ const MapBoard = (props) => {
               handleMarkerClick(marker);
             }}
           >
-            {isOpen && selected===marker ? (
-              <InfoWindow>
-                <div>
+            {isOpen && selected === marker ? (
+              <InfoBox
+                onCloseClick={() => handleCloseInfoWindow()}
+                options={{
+                  alignBottom: true,
+                  boxStyle: {
+                    boxShadow: `3px 3px 10px rgba(0,0,0,0.6)`,
+                  },
+                }}
+              >
+                <Styles.InfoContainer>
                   <h2>{selected.name}</h2>
-                </div>
-              </InfoWindow>
+                  {isImageLoaded ? (
+                    <img
+                      src={"data:image/png;base64, " + treeImage}
+                      height="256"
+                      width="256"
+                    ></img>
+                  ) : null}
+                </Styles.InfoContainer>
+              </InfoBox>
             ) : null}
           </Marker>
         ))}
