@@ -31,7 +31,7 @@ const theme = createMuiTheme({
     primary: {
       main: "#FFFFFF",
     },
-    background: { default: "#28965A" },
+    background: { default: "#839788" },
   },
   overrides: {
     MuiInput: {
