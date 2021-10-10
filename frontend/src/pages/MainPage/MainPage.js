@@ -4,7 +4,7 @@ import * as Styles from "./MainPage.styles";
 const MainPage = () => {
   return (
     <Styles.MainContainer>
-      <Styles.LeftContainer elevation={40}>
+      <Styles.LeftContainer elevation={0}>
         <Styles.HeaderContainer>
           <Styles.Header variant="h2">Treevision</Styles.Header>
         </Styles.HeaderContainer>

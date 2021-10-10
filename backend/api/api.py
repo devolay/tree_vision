@@ -3,6 +3,7 @@ import os,io
 from flask import Flask, request, jsonify, Response,make_response, send_file
 from flask_cors import CORS, cross_origin
 from owslib.wms import WebMapService
+import requests
 
 app = Flask(__name__)
 CORS(app, origins=[])
@@ -28,5 +29,22 @@ def get_tree_image():
                     size=(256,256),
                     format='image/png')
         return jsonify(imageB64 = str(base64.b64encode(img.read()))[2:-1])
+    else:
+        return Response(status=400)
+
+
+@app.route('/getGoogleImage/', methods=['GET'])
+@cross_origin(origins=[])
+def getGoogleImage():
+    lat = 0.0
+    lng = 0.0
+    if request.args.get("lat") is not None:
+        lat = float(request.args.get("lat"))
+    if request.args.get("lng") is not None:
+        lng = float(request.args.get("lng"))
+    endpoint = f'https://maps.googleapis.com/maps/api/staticmap?center={lat},{lng}&zoom=20&scale=2&size=600x600&maptype=satellite&key=AIzaSyDuWOOm87SUMP2w2JxSkxAlPzVRKIe3fZY'
+    response = requests.get(endpoint)
+    if lat!=0.0 and lng!=0.0:
+        return jsonify(imageB64 = str(base64.b64encode(response.content))[2:-1])
     else:
         return Response(status=400)

@@ -51,7 +51,7 @@ const MapBoard = (props) => {
       setIsImageLoaded(false);
     }
     await axios
-      .get("http://127.0.0.1:5000/getTreeImage/", {
+      .get("http://127.0.0.1:5000/getGoogleImage/", {
         params: {
           lat: marker.lat,
           lng: marker.lng,
