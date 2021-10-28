@@ -4,9 +4,11 @@ import { Typography, Paper, Button } from "@material-ui/core";
 export const LeftContainer = styled(Paper)`
   display: flex;
   flex-direction: column;
+  align-content: stretch;
   width: 25%;
   border-radius: 0px;
   background-color: #839788;
+  height:100%;
 `;
 
 export const RightContainer = styled.div`
@@ -28,6 +30,14 @@ export const HeaderContainer = styled.div`
   width: 100%;
   height: 100px;
   padding-left: 40px;
+`;
+
+export const SwitchContainer = styled.div`
+  display: flex;
+  justify-content:flex-end;
+  align-items: flex-end;
+  padding-right: 20px;
+  width:100%
 `;
 
 export const Header = styled(Typography)`

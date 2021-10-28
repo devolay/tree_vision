@@ -48,3 +48,18 @@ def getGoogleImage():
         return jsonify(imageB64 = str(base64.b64encode(response.content))[2:-1])
     else:
         return Response(status=400)
+
+# @app.route('/getMockedImage/', methods=['GET'])
+# @cross_origin(origins=[])
+# def getMockedImage():
+#     id = None
+#     mocked_dir="mocked/bdg_imagery"
+#     if request.args.get("id") is not None:
+#         id = request.args.get("id")
+#     if id is not None:
+#         print(id)
+#         with open(f'{mocked_dir}/{id}.0.jpg', "rb") as image:
+#            print(base64.b64encode(image.read()))
+#            return Response(status=200)
+#     else:
+#         return Response(status=400)

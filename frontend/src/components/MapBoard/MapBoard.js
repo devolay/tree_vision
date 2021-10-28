@@ -6,7 +6,7 @@ import {
 } from "@react-google-maps/api";
 import * as Styles from "./MapBoard.styles";
 import { GOOGLE_MAP_API_KEY } from "../../shared/constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { mapStyles } from "../../mapStyles";
 import data from "../../static/pelnabaza.json";
 
@@ -50,24 +50,30 @@ const MapBoard = (props) => {
       setIsOpen(false);
       setIsImageLoaded(false);
     }
-    await axios
-      .get("http://127.0.0.1:5000/getGoogleImage/", {
-        params: {
-          lat: marker.lat,
-          lng: marker.lng,
-        },
-        headers: {
-          "content-type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
-        },
-        crossDomain: true,
-      })
-      .then((response) => {
-        setTreeImage(response.data.imageB64)
-        setIsImageLoaded(true)
-    });
-
+    if(!props.mocked){
+      console.log("obrazek z google")
+      await axios
+        .get("http://127.0.0.1:5000/getGoogleImage/", {
+          params: {
+            lat: marker.lat,
+            lng: marker.lng,
+          },
+          headers: {
+            "content-type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
+          },
+          crossDomain: true,
+        })
+        .then((response) => {
+          setTreeImage(response.data.imageB64)
+      setIsImageLoaded(true)
+      });
+    }
+    else{
+      console.log("obrazek zmockowany")
+      setIsImageLoaded(true)
+    }
     setIsOpen(true);
   }
 
@@ -114,11 +120,17 @@ const MapBoard = (props) => {
                 <Styles.InfoContainer>
                   <h2>{selected.name}</h2>
                   {isImageLoaded ? (
-                    <img
-                      src={"data:image/png;base64, " + treeImage}
-                      height="256"
-                      width="256"
-                    ></img>
+                    props.mocked ? (
+                      <img
+                        src={"mocked/bdg_imagery/" + (marker.id) + ".0.jpg"}
+                        height="256"
+                        width="256"
+                      ></img> ) : 
+                      (<img
+                        src={"data:image/png;base64, " + treeImage}
+                        height="256"
+                        width="256"
+                      ></img>)
                   ) : null}
                 </Styles.InfoContainer>
               </InfoBox>
